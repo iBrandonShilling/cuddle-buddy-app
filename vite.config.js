@@ -9,6 +9,11 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
+  build: {
+    rollupOptions: {
+      external: []
+    }
+  },
   server: {
     port: 3000,
     open: true
