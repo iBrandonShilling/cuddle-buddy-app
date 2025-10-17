@@ -21,12 +21,12 @@
           <div class="text-6xl mb-4 animate-heart-beat">💖</div>
         </div>
 
-        <!-- Compatibility Score -->
+        <!-- Application Complete -->
         <div class="bg-gradient-to-r from-romantic-pink/20 to-gentle-purple/20 rounded-2xl p-6 mb-8">
-          <h3 class="text-2xl font-elegant text-center mb-4">Your Cuddle Compatibility Score</h3>
           <div class="text-center">
-            <div class="text-6xl font-romantic text-warm-coral mb-2">{{ compatibilityScore }}%</div>
-            <p class="text-lg text-gray-700">{{ compatibilityMessage }}</p>
+            <div class="text-6xl font-romantic text-warm-coral mb-4 animate-heart-beat">💕</div>
+            <h3 class="text-2xl font-elegant text-warm-coral mb-2">Application Complete!</h3>
+            <p class="text-lg text-gray-700">Your cuddle buddy application has been submitted successfully!</p>
           </div>
         </div>
 
@@ -121,8 +121,6 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const applicationData = ref({})
-const compatibilityScore = ref(0)
-const compatibilityMessage = ref('')
 const loading = ref(false)
 const emailSent = ref(false)
 
@@ -131,71 +129,11 @@ onMounted(() => {
   const storedData = localStorage.getItem('cuddleApplication')
   if (storedData) {
     applicationData.value = JSON.parse(storedData)
-    calculateCompatibility()
   } else {
     // If no data found, redirect to home
     router.push('/')
   }
 })
-
-const calculateCompatibility = () => {
-  let score = 0
-  const data = applicationData.value
-  
-  // Base score for completing the application
-  score += 20
-  
-  // Age compatibility (18-30 gets bonus points)
-  const age = parseInt(data.age)
-  if (age >= 18 && age <= 30) score += 15
-  else if (age >= 31 && age <= 45) score += 10
-  else score += 5
-  
-  // Cuddle frequency bonus
-  if (data.cuddleFrequency === 'daily') score += 20
-  else if (data.cuddleFrequency === 'weekly') score += 15
-  else if (data.cuddleFrequency === 'weekend') score += 10
-  else score += 5
-  
-  // Love language bonus
-  if (data.loveLanguage === 'physical') score += 15
-  else if (data.loveLanguage === 'words') score += 12
-  else if (data.loveLanguage === 'time') score += 10
-  else score += 8
-  
-  // Temperature preference bonus
-  if (data.idealTemperature?.includes('Warm')) score += 10
-  else if (data.idealTemperature?.includes('Body')) score += 8
-  else score += 5
-  
-  // Cuddle position bonus
-  if (data.favoritePosition?.includes('Spooning')) score += 10
-  else if (data.favoritePosition?.includes('Face to Face')) score += 8
-  else score += 5
-  
-  // Text length bonus (more detailed answers)
-  if (data.perfectCuddle && data.perfectCuddle.length > 50) score += 10
-  if (data.whatMakesYouFeelLoved && data.whatMakesYouFeelLoved.length > 50) score += 10
-  
-  // Random romantic bonus (85-98%)
-  const randomBonus = Math.floor(Math.random() * 14) + 85
-  score = Math.min(score, randomBonus)
-  
-  compatibilityScore.value = score
-  
-  // Set message based on score
-  if (score >= 95) {
-    compatibilityMessage.value = "Perfect Match! 💕"
-  } else if (score >= 90) {
-    compatibilityMessage.value = "Amazing Compatibility! 💖"
-  } else if (score >= 85) {
-    compatibilityMessage.value = "Great Match! 💗"
-  } else if (score >= 80) {
-    compatibilityMessage.value = "Good Compatibility! 💝"
-  } else {
-    compatibilityMessage.value = "Nice Match! 💘"
-  }
-}
 
 const getFrequencyText = (frequency) => {
   const frequencyMap = {
@@ -256,38 +194,27 @@ const sendResults = async () => {
     const emailContent = `
 Subject: Your Cuddle Buddy Application Results! 💕
 
-Dear ${applicationData.value.name},
+Dear Friend,
 
-Congratulations! Your cuddle buddy application has been processed and you scored an amazing ${compatibilityScore.value}% compatibility! 
+Someone special has filled out a cuddle buddy application! Here are their details:
 
-Here are your results:
-
-🌟 Your Cuddle Profile:
+🌟 Their Cuddle Profile:
 - Name: ${applicationData.value.name} (${applicationData.value.age} years young!)
 - Favorite Position: ${applicationData.value.favoritePosition}
 - Cuddle Frequency: ${getFrequencyText(applicationData.value.cuddleFrequency)}
 - Ideal Temperature: ${applicationData.value.idealTemperature}
 - Love Language: ${getLoveLanguageText(applicationData.value.loveLanguage)}
 
-💭 Your Perfect Cuddle:
+💭 Their Perfect Cuddle:
 "${applicationData.value.perfectCuddle}"
 
-💖 What Makes You Feel Loved:
+💖 What Makes Them Feel Loved:
 "${applicationData.value.whatMakesYouFeelLoved}"
 
-🔮 Compatibility Analysis:
-✨ Amazing cuddle communication
-🤗 Perfect temperature compatibility  
-💖 Strong emotional connection potential
-🌟 Natural cuddle chemistry
+🎯 Their Contact Info:
+- Email: ${applicationData.value.email}
 
-🎯 Recommendations:
-💕 Start with gentle cuddles
-🌙 Perfect for evening sessions
-🎵 Soft music enhances the mood
-🕯️ Dim lighting creates magic
-
-You're a perfect cuddle buddy candidate! Someone special is going to be very lucky to have you! 💕
+This person is looking for a cuddle buddy! They've shared their preferences and what makes them feel loved. Perfect for getting to know them better! 💕
 
 With love and cuddles,
 Your Cuddle Buddy Matchmaker 💖

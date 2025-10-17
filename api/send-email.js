@@ -35,7 +35,6 @@ export default async function handler(req, res) {
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .header { text-align: center; color: #FF7F7F; font-size: 2.5rem; margin-bottom: 20px; }
         .card { background: white; padding: 30px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .score { text-align: center; font-size: 3rem; color: #FF7F7F; font-weight: bold; margin: 20px 0; }
         .profile { background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; }
         .quote { background: #fff3cd; padding: 20px; border-radius: 10px; margin: 20px 0; font-style: italic; }
         .footer { text-align: center; color: #666; font-size: 0.9rem; margin-top: 30px; }
@@ -44,38 +43,43 @@ export default async function handler(req, res) {
     </head>
     <body>
       <div class="container">
-        <div class="header">💕 Cuddle Buddy Results 💕</div>
+        <div class="header">💕 Cuddle Buddy Application 💕</div>
         
         <div class="card">
-          <h2 style="color: #FF7F7F;">Dear ${name},</h2>
-          <p style="font-size: 1.2rem; color: #666;">Congratulations! Your cuddle buddy application has been processed and you scored an amazing compatibility score!</p>
-          
-          <div class="score">${compatibilityScore}%</div>
+          <h2 style="color: #FF7F7F;">Dear Friend,</h2>
+          <p style="font-size: 1.2rem; color: #666;">Someone special has filled out a cuddle buddy application! Here are their details:</p>
           
           <div class="profile">
-            <h3 style="color: #FF7F7F;">🌟 Your Cuddle Profile:</h3>
+            <h3 style="color: #FF7F7F;">🌟 Their Cuddle Profile:</h3>
             <ul style="list-style: none; padding: 0;">
               <li style="margin: 10px 0;"><strong>Name:</strong> ${name} (${applicationData.age} years young!)</li>
               <li style="margin: 10px 0;"><strong>Favorite Position:</strong> ${applicationData.favoritePosition}</li>
               <li style="margin: 10px 0;"><strong>Cuddle Frequency:</strong> ${applicationData.cuddleFrequency}</li>
               <li style="margin: 10px 0;"><strong>Ideal Temperature:</strong> ${applicationData.idealTemperature}</li>
               <li style="margin: 10px 0;"><strong>Love Language:</strong> ${applicationData.loveLanguage}</li>
+              <li style="margin: 10px 0;"><strong>Ideal Date:</strong> ${applicationData.idealDate || 'Not specified'}</li>
+              <li style="margin: 10px 0;"><strong>Favorite Affection:</strong> ${applicationData.favoriteAffection || 'Not specified'}</li>
             </ul>
           </div>
           
           <div class="quote">
-            <h3 style="color: #FF7F7F;">💭 Your Perfect Cuddle:</h3>
+            <h3 style="color: #FF7F7F;">💭 Their Perfect Cuddle:</h3>
             <p>"${applicationData.perfectCuddle}"</p>
           </div>
           
           <div class="quote">
-            <h3 style="color: #FF7F7F;">💖 What Makes You Feel Loved:</h3>
+            <h3 style="color: #FF7F7F;">💖 What Makes Them Feel Loved:</h3>
             <p>"${applicationData.whatMakesYouFeelLoved}"</p>
           </div>
           
+          <div style="background: #d1ecf1; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h3 style="color: #FF7F7F;">🎯 Their Contact Info:</h3>
+            <p><strong>Email:</strong> ${applicationData.email}</p>
+          </div>
+          
           <div style="text-align: center; margin: 30px 0;">
-            <h2 style="color: #FF7F7F; font-size: 2rem;">You're a perfect cuddle buddy candidate! <span class="heart">💕</span></h2>
-            <p style="font-size: 1.1rem; color: #666;">Someone special is going to be very lucky to have you!</p>
+            <h2 style="color: #FF7F7F; font-size: 2rem;">This person is looking for a cuddle buddy! <span class="heart">💕</span></h2>
+            <p style="font-size: 1.1rem; color: #666;">They've shared their preferences and what makes them feel loved. Perfect for getting to know them better!</p>
           </div>
         </div>
         

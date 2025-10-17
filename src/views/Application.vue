@@ -370,22 +370,30 @@ const validationField = ref('')
 
 // Get creator email from URL params (encrypted)
 onMounted(() => {
-  const urlParams = new URLSearchParams(window.location.search)
-  const creator = urlParams.get('creator')
-  const encrypted = urlParams.get('c')
-  
-  if (creator) {
-    // Old format (unencrypted)
-    creatorEmail.value = decodeURIComponent(creator)
-    form.value.recipientEmail = creatorEmail.value
-  } else if (encrypted) {
-    // New format (encrypted)
-    try {
-      creatorEmail.value = atob(encrypted)
+  try {
+    const urlParams = new URLSearchParams(window.location.search)
+    const creator = urlParams.get('creator')
+    const encrypted = urlParams.get('c')
+    
+    console.log('URL params:', { creator, encrypted })
+    
+    if (creator) {
+      // Old format (unencrypted)
+      creatorEmail.value = decodeURIComponent(creator)
       form.value.recipientEmail = creatorEmail.value
-    } catch (error) {
-      console.error('Error decoding email:', error)
+      console.log('Set creator email (old format):', creatorEmail.value)
+    } else if (encrypted) {
+      // New format (encrypted)
+      try {
+        creatorEmail.value = atob(encrypted)
+        form.value.recipientEmail = creatorEmail.value
+        console.log('Set creator email (encrypted):', creatorEmail.value)
+      } catch (error) {
+        console.error('Error decoding email:', error)
+      }
     }
+  } catch (error) {
+    console.error('Error in onMounted:', error)
   }
 })
 
