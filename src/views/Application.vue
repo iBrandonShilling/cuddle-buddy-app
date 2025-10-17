@@ -142,7 +142,7 @@
               <textarea 
                 v-model="form.perfectCuddle"
                 class="romantic-input h-24 resize-none"
-                placeholder="Tell us about your dream cuddle scenario..."
+                placeholder="Tell us about your dream cuddle scenario... What makes it perfect? 💭"
               ></textarea>
             </div>
 
@@ -151,8 +151,36 @@
               <textarea 
                 v-model="form.whatMakesYouFeelLoved"
                 class="romantic-input h-24 resize-none"
-                placeholder="Share what makes your heart flutter..."
+                placeholder="Share what makes your heart flutter... What makes you feel special? 💖"
               ></textarea>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">What's your ideal date night?</label>
+              <select v-model="form.idealDate" class="romantic-input">
+                <option value="">Choose your perfect date</option>
+                <option value="cozy">Cozy night in with movies and cuddles 🍿</option>
+                <option value="outdoor">Romantic walk under the stars 🌟</option>
+                <option value="dinner">Intimate dinner for two 🍽️</option>
+                <option value="adventure">Fun adventure together 🎢</option>
+                <option value="spa">Relaxing spa day together 🧖‍♀️</option>
+                <option value="surprise">I love surprises! 🎁</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">What's your favorite way to show affection?</label>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <label v-for="affection in affectionWays" :key="affection" class="flex items-center space-x-2 cursor-pointer">
+                  <input 
+                    v-model="form.favoriteAffection"
+                    type="radio" 
+                    :value="affection"
+                    class="text-warm-coral focus:ring-warm-coral"
+                  />
+                  <span class="text-sm">{{ affection }}</span>
+                </label>
+              </div>
             </div>
           </div>
         </div>
@@ -254,6 +282,8 @@ const form = ref({
   loveLanguage: '',
   perfectCuddle: '',
   whatMakesYouFeelLoved: '',
+  idealDate: '',
+  favoriteAffection: '',
   photo: null
 })
 
@@ -319,6 +349,18 @@ const validationMessages = {
     "Tell us what makes you feel most loved! 💖",
     "What makes you feel secure and loved? ✨",
     "We want to know what makes you feel special! 💕"
+  ],
+  idealDate: [
+    "What's your perfect date night, cutie? 🌟",
+    "Tell us about your dream date! 💕",
+    "What kind of date makes your heart skip? 💖",
+    "We need to know your ideal romantic evening! ✨"
+  ],
+  favoriteAffection: [
+    "How do you like to show love, sweetie? 💕",
+    "What's your favorite way to be affectionate? 💖",
+    "Tell us how you express your feelings! 💗",
+    "We want to know your love style! ✨"
   ]
 }
 
@@ -326,13 +368,24 @@ const showValidationMessage = ref(false)
 const currentValidationMessage = ref('')
 const validationField = ref('')
 
-// Get creator email from URL params
+// Get creator email from URL params (encrypted)
 onMounted(() => {
   const urlParams = new URLSearchParams(window.location.search)
   const creator = urlParams.get('creator')
+  const encrypted = urlParams.get('c')
+  
   if (creator) {
+    // Old format (unencrypted)
     creatorEmail.value = decodeURIComponent(creator)
     form.value.recipientEmail = creatorEmail.value
+  } else if (encrypted) {
+    // New format (encrypted)
+    try {
+      creatorEmail.value = atob(encrypted)
+      form.value.recipientEmail = creatorEmail.value
+    } catch (error) {
+      console.error('Error decoding email:', error)
+    }
   }
 })
 
@@ -354,6 +407,15 @@ const temperatures = [
   'Body Temperature 🤗'
 ]
 
+const affectionWays = [
+  'Hugs & Cuddles 🤗',
+  'Sweet Words 💬',
+  'Little Gifts 🎁',
+  'Quality Time ⏰',
+  'Acts of Service 🤝',
+  'Physical Touch 💕'
+]
+
 const isFormValid = computed(() => {
   return form.value.name && 
          form.value.age && 
@@ -364,7 +426,9 @@ const isFormValid = computed(() => {
          form.value.idealTemperature &&
          form.value.loveLanguage &&
          form.value.perfectCuddle &&
-         form.value.whatMakesYouFeelLoved
+         form.value.whatMakesYouFeelLoved &&
+         form.value.idealDate &&
+         form.value.favoriteAffection
 })
 
 const triggerFileUpload = () => {
@@ -432,6 +496,14 @@ const submitApplication = () => {
   }
   if (!form.value.whatMakesYouFeelLoved) {
     showCuteValidation('whatMakesYouFeelLoved')
+    return
+  }
+  if (!form.value.idealDate) {
+    showCuteValidation('idealDate')
+    return
+  }
+  if (!form.value.favoriteAffection) {
+    showCuteValidation('favoriteAffection')
     return
   }
   
