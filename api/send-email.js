@@ -1,3 +1,6 @@
+// Free email service using Gmail SMTP - no third-party services needed!
+import nodemailer from 'nodemailer'
+
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
@@ -12,59 +15,95 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Create email content
-    const emailContent = `
-Subject: Your Cuddle Buddy Application Results! 💕
+    // Create Gmail transporter (completely free!)
+    const transporter = nodemailer.createTransporter({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER, // Your Gmail address
+        pass: process.env.GMAIL_APP_PASSWORD // Gmail App Password (not your regular password)
+      }
+    })
 
-Dear ${name},
-
-Congratulations! Your cuddle buddy application has been processed and you scored an amazing ${compatibilityScore}% compatibility! 
-
-Here are your results:
-
-🌟 Your Cuddle Profile:
-- Name: ${name} (${applicationData.age} years young!)
-- Favorite Position: ${applicationData.favoritePosition}
-- Cuddle Frequency: ${applicationData.cuddleFrequency}
-- Ideal Temperature: ${applicationData.idealTemperature}
-- Love Language: ${applicationData.loveLanguage}
-
-💭 Your Perfect Cuddle:
-"${applicationData.perfectCuddle}"
-
-💖 What Makes You Feel Loved:
-"${applicationData.whatMakesYouFeelLoved}"
-
-🔮 Compatibility Analysis:
-✨ Amazing cuddle communication
-🤗 Perfect temperature compatibility  
-💖 Strong emotional connection potential
-🌟 Natural cuddle chemistry
-
-🎯 Recommendations:
-💕 Start with gentle cuddles
-🌙 Perfect for evening sessions
-🎵 Soft music enhances the mood
-🕯️ Dim lighting creates magic
-
-You're a perfect cuddle buddy candidate! Someone special is going to be very lucky to have you! 💕
-
-With love and cuddles,
-Your Cuddle Buddy Matchmaker 💖
+    // Create beautiful HTML email
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #FFB6C1, #FFC0CB, #DDA0DD); }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; color: #FF7F7F; font-size: 2.5rem; margin-bottom: 20px; }
+        .card { background: white; padding: 30px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .score { text-align: center; font-size: 3rem; color: #FF7F7F; font-weight: bold; margin: 20px 0; }
+        .profile { background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .quote { background: #fff3cd; padding: 20px; border-radius: 10px; margin: 20px 0; font-style: italic; }
+        .footer { text-align: center; color: #666; font-size: 0.9rem; margin-top: 30px; }
+        .heart { color: #FF7F7F; font-size: 1.5rem; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">💕 Cuddle Buddy Results 💕</div>
+        
+        <div class="card">
+          <h2 style="color: #FF7F7F;">Dear ${name},</h2>
+          <p style="font-size: 1.2rem; color: #666;">Congratulations! Your cuddle buddy application has been processed and you scored an amazing compatibility score!</p>
+          
+          <div class="score">${compatibilityScore}%</div>
+          
+          <div class="profile">
+            <h3 style="color: #FF7F7F;">🌟 Your Cuddle Profile:</h3>
+            <ul style="list-style: none; padding: 0;">
+              <li style="margin: 10px 0;"><strong>Name:</strong> ${name} (${applicationData.age} years young!)</li>
+              <li style="margin: 10px 0;"><strong>Favorite Position:</strong> ${applicationData.favoritePosition}</li>
+              <li style="margin: 10px 0;"><strong>Cuddle Frequency:</strong> ${applicationData.cuddleFrequency}</li>
+              <li style="margin: 10px 0;"><strong>Ideal Temperature:</strong> ${applicationData.idealTemperature}</li>
+              <li style="margin: 10px 0;"><strong>Love Language:</strong> ${applicationData.loveLanguage}</li>
+            </ul>
+          </div>
+          
+          <div class="quote">
+            <h3 style="color: #FF7F7F;">💭 Your Perfect Cuddle:</h3>
+            <p>"${applicationData.perfectCuddle}"</p>
+          </div>
+          
+          <div class="quote">
+            <h3 style="color: #FF7F7F;">💖 What Makes You Feel Loved:</h3>
+            <p>"${applicationData.whatMakesYouFeelLoved}"</p>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <h2 style="color: #FF7F7F; font-size: 2rem;">You're a perfect cuddle buddy candidate! <span class="heart">💕</span></h2>
+            <p style="font-size: 1.1rem; color: #666;">Someone special is going to be very lucky to have you!</p>
+          </div>
+        </div>
+        
+        <div class="footer">
+          <p>With love and cuddles,<br>Your Cuddle Buddy Matchmaker <span class="heart">💖</span></p>
+        </div>
+      </div>
+    </body>
+    </html>
     `
 
-    // For now, we'll use a simple approach with a public email service
-    // In production, you'd want to use a proper email service like SendGrid, Resend, or Nodemailer
+    // Send email using Gmail (completely free!)
+    const mailOptions = {
+      from: process.env.GMAIL_USER, // Your Gmail address
+      to: recipientEmail,
+      subject: 'Your Cuddle Buddy Application Results! 💕',
+      html: htmlContent
+    }
+
+    // Send the email
+    const info = await transporter.sendMail(mailOptions)
     
-    // Simulate email sending (replace with actual email service)
-    console.log('Email would be sent to:', recipientEmail)
-    console.log('Email content:', emailContent)
+    console.log('Email sent successfully:', info.messageId)
     
-    // Return success response
     return res.status(200).json({ 
       success: true, 
       message: 'Email sent successfully! 💕',
-      emailContent: emailContent // Include content for fallback
+      messageId: info.messageId
     })
 
   } catch (error) {
