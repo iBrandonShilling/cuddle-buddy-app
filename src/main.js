@@ -6,11 +6,13 @@ import './style.css'
 
 // Import pages
 import Home from './views/Home.vue'
+import CreateLink from './views/CreateLink.vue'
 import Application from './views/Application.vue'
 import Results from './views/Results.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
+  { path: '/create', name: 'CreateLink', component: CreateLink },
   { path: '/apply', name: 'Application', component: Application },
   { path: '/results', name: 'Results', component: Results },
   { path: '/:pathMatch(.*)*', redirect: '/' }

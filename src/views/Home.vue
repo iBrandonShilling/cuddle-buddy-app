@@ -21,17 +21,26 @@
         <div class="text-8xl animate-float" style="animation-delay: 2s;">🐰</div>
       </div>
 
-      <!-- Start Button -->
+      <!-- Action Buttons -->
       <div class="space-y-4">
-        <button 
-          @click="startApplication"
-          class="romantic-button text-2xl font-romantic animate-heart-beat"
-        >
-          Start My Application ✨
-        </button>
+        <div class="grid md:grid-cols-2 gap-4">
+          <button 
+            @click="createLink"
+            class="romantic-button text-xl font-romantic animate-heart-beat"
+          >
+            Create Link for Someone 💕
+          </button>
+          
+          <button 
+            @click="startApplication"
+            class="bg-white/70 text-warm-coral border-2 border-warm-coral font-semibold py-3 px-8 rounded-full hover:bg-warm-coral hover:text-white transition-all duration-300 text-xl font-romantic"
+          >
+            Fill Out Application ✨
+          </button>
+        </div>
         
         <p class="text-sm text-gray-500 italic">
-          *This application is completely anonymous and fun!*
+          *Create a link to send to someone special, or fill out an application yourself!*
         </p>
       </div>
 
@@ -53,5 +62,9 @@ const router = useRouter()
 
 const startApplication = () => {
   router.push('/apply')
+}
+
+const createLink = () => {
+  router.push('/create')
 }
 </script>

@@ -172,7 +172,20 @@
                 placeholder="your.email@example.com"
               />
             </div>
-            <div>
+            <div v-if="creatorEmail">
+              <div class="bg-gradient-to-r from-romantic-pink/20 to-gentle-purple/20 rounded-xl p-4 mb-4">
+                <div class="text-center">
+                  <div class="text-2xl mb-2">💕</div>
+                  <p class="text-sm text-gray-700">
+                    Your results will be sent to the person who sent you this link!
+                  </p>
+                  <p class="text-xs text-gray-500 mt-1">
+                    They're waiting to see your cuddle buddy application! 💖
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div v-else>
               <label class="block text-sm font-medium text-gray-700 mb-2">Where should we send your results?</label>
               <input 
                 v-model="form.recipientEmail"
@@ -244,6 +257,8 @@ const form = ref({
   photo: null
 })
 
+const creatorEmail = ref('')
+
 const validationMessages = {
   name: [
     "Oops! We need to know what to call you, cutie! 💕",
@@ -310,6 +325,16 @@ const validationMessages = {
 const showValidationMessage = ref(false)
 const currentValidationMessage = ref('')
 const validationField = ref('')
+
+// Get creator email from URL params
+onMounted(() => {
+  const urlParams = new URLSearchParams(window.location.search)
+  const creator = urlParams.get('creator')
+  if (creator) {
+    creatorEmail.value = decodeURIComponent(creator)
+    form.value.recipientEmail = creatorEmail.value
+  }
+})
 
 const cuddlePositions = [
   'Spooning 🥄',
