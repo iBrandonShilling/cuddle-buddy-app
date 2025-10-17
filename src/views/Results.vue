@@ -88,9 +88,12 @@
       <div class="text-center space-y-4">
         <button 
           @click="sendResults"
-          class="romantic-button text-xl font-romantic animate-heart-beat"
+          :disabled="loading"
+          class="romantic-button text-xl font-romantic animate-heart-beat disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Send Results via Email 📧
+          <span v-if="loading">Sending... 💕</span>
+          <span v-else-if="emailSent">Email Sent! ✅</span>
+          <span v-else>Send Results via Email 📧</span>
         </button>
         
         <button 
@@ -120,6 +123,8 @@ const router = useRouter()
 const applicationData = ref({})
 const compatibilityScore = ref(0)
 const compatibilityMessage = ref('')
+const loading = ref(false)
+const emailSent = ref(false)
 
 onMounted(() => {
   // Get form data from localStorage
@@ -213,9 +218,42 @@ const getLoveLanguageText = (language) => {
   return languageMap[language] || language
 }
 
-const sendResults = () => {
-  // Create email content
-  const emailContent = `
+const sendResults = async () => {
+  const loading = ref(false)
+  const emailSent = ref(false)
+  
+  try {
+    loading.value = true
+    
+    // Send email via our Vercel API
+    const response = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        recipientEmail: applicationData.value.recipientEmail,
+        name: applicationData.value.name,
+        compatibilityScore: compatibilityScore.value,
+        applicationData: applicationData.value
+      })
+    })
+    
+    const result = await response.json()
+    
+    if (response.ok) {
+      emailSent.value = true
+      // Show success message
+      alert('Email sent successfully! 💕 Check the recipient\'s inbox!')
+    } else {
+      throw new Error(result.error || 'Failed to send email')
+    }
+    
+  } catch (error) {
+    console.error('Error sending email:', error)
+    
+    // Fallback to manual email method
+    const emailContent = `
 Subject: Your Cuddle Buddy Application Results! 💕
 
 Dear ${applicationData.value.name},
@@ -253,22 +291,18 @@ You're a perfect cuddle buddy candidate! Someone special is going to be very luc
 
 With love and cuddles,
 Your Cuddle Buddy Matchmaker 💖
-  `
-
-  // Create mailto link that opens the user's default email client
-  const mailtoLink = `mailto:${applicationData.value.recipientEmail}?subject=${encodeURIComponent('Your Cuddle Buddy Application Results! 💕')}&body=${encodeURIComponent(emailContent)}`
-  
-  // Try to open in default email client
-  try {
-    window.location.href = mailtoLink
-  } catch (error) {
-    // Fallback: copy to clipboard and show instructions
-    navigator.clipboard.writeText(emailContent).then(() => {
-      alert('Email content copied to clipboard! You can now paste it into your email client and send it to ' + applicationData.value.recipientEmail)
-    }).catch(() => {
-      // Final fallback: show the content in a modal
-      showEmailModal()
-    })
+    `
+    
+    // Try to copy to clipboard
+    try {
+      await navigator.clipboard.writeText(emailContent)
+      alert('Email service unavailable. Content copied to clipboard! Paste it into your email and send to ' + applicationData.value.recipientEmail)
+    } catch {
+      // Show modal with email content
+      showEmailModal(emailContent)
+    }
+  } finally {
+    loading.value = false
   }
 }
 
