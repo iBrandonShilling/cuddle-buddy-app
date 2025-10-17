@@ -23,7 +23,21 @@ const router = createRouter({
 
 const pinia = createPinia()
 
-createApp(App)
-  .use(pinia)
-  .use(router)
-  .mount('#app')
+// Add error handling
+try {
+  const app = createApp(App)
+  app.use(pinia)
+  app.use(router)
+  app.mount('#app')
+} catch (error) {
+  console.error('Vue app failed to mount:', error)
+  document.getElementById('app').innerHTML = `
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: linear-gradient(135deg, #FFB6C1, #FFC0CB, #DDA0DD); font-family: 'Dancing Script', cursive; color: #FF7F7F; font-size: 2rem; text-align: center;">
+      <div>
+        <div style="font-size: 4rem; margin-bottom: 1rem;">💕</div>
+        <div>Oops! Something went wrong loading the Cuddle Buddy Application.</div>
+        <div style="font-size: 1rem; margin-top: 1rem;">Please refresh the page.</div>
+      </div>
+    </div>
+  `
+}
