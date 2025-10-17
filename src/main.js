@@ -12,7 +12,8 @@ import Results from './views/Results.vue'
 const routes = [
   { path: '/', name: 'Home', component: Home },
   { path: '/apply', name: 'Application', component: Application },
-  { path: '/results', name: 'Results', component: Results }
+  { path: '/results', name: 'Results', component: Results },
+  { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 
 const router = createRouter({
