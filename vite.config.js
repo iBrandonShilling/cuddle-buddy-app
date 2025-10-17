@@ -13,7 +13,9 @@ export default defineConfig({
   build: {
     rollupOptions: {
       external: []
-    }
+    },
+    outDir: 'dist',
+    assetsDir: 'assets'
   },
   server: {
     port: 3000,
