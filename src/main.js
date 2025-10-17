@@ -23,12 +23,21 @@ const router = createRouter({
 
 const pinia = createPinia()
 
-// Add error handling
+// Add error handling and debugging
+console.log('Starting Vue app...')
+
 try {
   const app = createApp(App)
+  console.log('Vue app created')
+  
   app.use(pinia)
+  console.log('Pinia added')
+  
   app.use(router)
+  console.log('Router added')
+  
   app.mount('#app')
+  console.log('App mounted successfully!')
 } catch (error) {
   console.error('Vue app failed to mount:', error)
   document.getElementById('app').innerHTML = `
@@ -37,6 +46,7 @@ try {
         <div style="font-size: 4rem; margin-bottom: 1rem;">💕</div>
         <div>Oops! Something went wrong loading the Cuddle Buddy Application.</div>
         <div style="font-size: 1rem; margin-top: 1rem;">Please refresh the page.</div>
+        <div style="font-size: 0.8rem; margin-top: 0.5rem; color: #999;">Error: ${error.message}</div>
       </div>
     </div>
   `
