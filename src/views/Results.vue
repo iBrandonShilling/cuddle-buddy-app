@@ -25,8 +25,8 @@
         <div class="bg-gradient-to-r from-romantic-pink/20 to-gentle-purple/20 rounded-2xl p-6 mb-8">
           <h3 class="text-2xl font-elegant text-center mb-4">Your Cuddle Compatibility Score</h3>
           <div class="text-center">
-            <div class="text-6xl font-romantic text-warm-coral mb-2">98%</div>
-            <p class="text-lg text-gray-700">Perfect Match! 💕</p>
+            <div class="text-6xl font-romantic text-warm-coral mb-2">{{ compatibilityScore }}%</div>
+            <p class="text-lg text-gray-700">{{ compatibilityMessage }}</p>
           </div>
         </div>
 
@@ -118,17 +118,79 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const applicationData = ref({})
+const compatibilityScore = ref(0)
+const compatibilityMessage = ref('')
 
 onMounted(() => {
   // Get form data from localStorage
   const storedData = localStorage.getItem('cuddleApplication')
   if (storedData) {
     applicationData.value = JSON.parse(storedData)
+    calculateCompatibility()
   } else {
     // If no data found, redirect to home
     router.push('/')
   }
 })
+
+const calculateCompatibility = () => {
+  let score = 0
+  const data = applicationData.value
+  
+  // Base score for completing the application
+  score += 20
+  
+  // Age compatibility (18-30 gets bonus points)
+  const age = parseInt(data.age)
+  if (age >= 18 && age <= 30) score += 15
+  else if (age >= 31 && age <= 45) score += 10
+  else score += 5
+  
+  // Cuddle frequency bonus
+  if (data.cuddleFrequency === 'daily') score += 20
+  else if (data.cuddleFrequency === 'weekly') score += 15
+  else if (data.cuddleFrequency === 'weekend') score += 10
+  else score += 5
+  
+  // Love language bonus
+  if (data.loveLanguage === 'physical') score += 15
+  else if (data.loveLanguage === 'words') score += 12
+  else if (data.loveLanguage === 'time') score += 10
+  else score += 8
+  
+  // Temperature preference bonus
+  if (data.idealTemperature?.includes('Warm')) score += 10
+  else if (data.idealTemperature?.includes('Body')) score += 8
+  else score += 5
+  
+  // Cuddle position bonus
+  if (data.favoritePosition?.includes('Spooning')) score += 10
+  else if (data.favoritePosition?.includes('Face to Face')) score += 8
+  else score += 5
+  
+  // Text length bonus (more detailed answers)
+  if (data.perfectCuddle && data.perfectCuddle.length > 50) score += 10
+  if (data.whatMakesYouFeelLoved && data.whatMakesYouFeelLoved.length > 50) score += 10
+  
+  // Random romantic bonus (85-98%)
+  const randomBonus = Math.floor(Math.random() * 14) + 85
+  score = Math.min(score, randomBonus)
+  
+  compatibilityScore.value = score
+  
+  // Set message based on score
+  if (score >= 95) {
+    compatibilityMessage.value = "Perfect Match! 💕"
+  } else if (score >= 90) {
+    compatibilityMessage.value = "Amazing Compatibility! 💖"
+  } else if (score >= 85) {
+    compatibilityMessage.value = "Great Match! 💗"
+  } else if (score >= 80) {
+    compatibilityMessage.value = "Good Compatibility! 💝"
+  } else {
+    compatibilityMessage.value = "Nice Match! 💘"
+  }
+}
 
 const getFrequencyText = (frequency) => {
   const frequencyMap = {
@@ -158,7 +220,7 @@ Subject: Your Cuddle Buddy Application Results! 💕
 
 Dear ${applicationData.value.name},
 
-Congratulations! Your cuddle buddy application has been processed and you scored an amazing 98% compatibility! 
+Congratulations! Your cuddle buddy application has been processed and you scored an amazing ${compatibilityScore.value}% compatibility! 
 
 Here are your results:
 
@@ -193,10 +255,41 @@ With love and cuddles,
 Your Cuddle Buddy Matchmaker 💖
   `
 
-  // Create mailto link
+  // Create mailto link that opens the user's default email client
   const mailtoLink = `mailto:${applicationData.value.recipientEmail}?subject=${encodeURIComponent('Your Cuddle Buddy Application Results! 💕')}&body=${encodeURIComponent(emailContent)}`
   
-  window.open(mailtoLink, '_blank')
+  // Try to open in default email client
+  try {
+    window.location.href = mailtoLink
+  } catch (error) {
+    // Fallback: copy to clipboard and show instructions
+    navigator.clipboard.writeText(emailContent).then(() => {
+      alert('Email content copied to clipboard! You can now paste it into your email client and send it to ' + applicationData.value.recipientEmail)
+    }).catch(() => {
+      // Final fallback: show the content in a modal
+      showEmailModal()
+    })
+  }
+}
+
+const showEmailModal = () => {
+  const modal = document.createElement('div')
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.8); z-index: 9999; display: flex; 
+    align-items: center; justify-content: center; padding: 20px;
+  `
+  modal.innerHTML = `
+    <div style="background: white; border-radius: 20px; padding: 30px; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+      <h3 style="color: #FF7F7F; font-size: 24px; margin-bottom: 20px;">📧 Email Content</h3>
+      <p style="margin-bottom: 15px;">Copy this content and send it to: <strong>${applicationData.value.recipientEmail}</strong></p>
+      <textarea readonly style="width: 100%; height: 300px; padding: 15px; border: 2px solid #FFB6C1; border-radius: 10px; font-family: monospace; font-size: 12px;">${emailContent}</textarea>
+      <div style="margin-top: 20px; text-align: center;">
+        <button onclick="this.closest('div').parentElement.remove()" style="background: #FF7F7F; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">Close</button>
+      </div>
+    </div>
+  `
+  document.body.appendChild(modal)
 }
 
 const startNewApplication = () => {
