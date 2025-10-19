@@ -10,18 +10,18 @@
           Tell us about yourself and your cuddle preferences!
         </p>
         
-        <!-- Test Button -->
-        <div class="mt-6">
-          <button 
-            @click="fillTestData"
-            class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-full hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-          >
-            🧪 Fill Test Data (For Testing Email)
-          </button>
-          <p class="text-xs text-gray-500 mt-2">
-            This will fill out all fields with sample data for testing
-          </p>
-        </div>
+            <!-- Test Button - Hidden in production -->
+            <div class="mt-6" v-if="isDevelopment">
+              <button
+                @click="fillTestData"
+                class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-full hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                🧪 Fill Test Data (For Testing Email)
+              </button>
+              <p class="text-xs text-gray-500 mt-2">
+                This will fill out all fields with sample data for testing
+              </p>
+            </div>
       </div>
 
       <form @submit.prevent="submitApplication" class="space-y-8">
@@ -458,6 +458,10 @@ const isFormValid = computed(() => {
          form.value.idealDate &&
          form.value.favoriteAffection &&
          form.value.photo
+})
+
+const isDevelopment = computed(() => {
+  return import.meta.env.DEV || window.location.hostname === 'localhost'
 })
 
 const triggerFileUpload = () => {
