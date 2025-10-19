@@ -461,7 +461,17 @@ const isFormValid = computed(() => {
 })
 
 const isDevelopment = computed(() => {
-  return import.meta.env.DEV || window.location.hostname === 'localhost'
+  const hostname = window.location.hostname
+  const isProduction = hostname.includes('vercel.app') || hostname.includes('netlify.app')
+  
+  return !isProduction && (
+    import.meta.env.DEV || 
+    hostname === 'localhost' || 
+    hostname === '127.0.0.1' ||
+    hostname.includes('localhost') ||
+    hostname.includes('192.168') ||
+    hostname.includes('10.0.0')
+  )
 })
 
 const triggerFileUpload = () => {
