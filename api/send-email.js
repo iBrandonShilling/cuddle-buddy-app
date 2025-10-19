@@ -1,5 +1,5 @@
 // Free email service using Gmail SMTP - no third-party services needed!
-import nodemailer from 'nodemailer'
+import { createTransport } from 'nodemailer'
 
 export default async function handler(req, res) {
   // Only allow POST requests
@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
   try {
     // Create Gmail transporter (completely free!)
-    const transporter = nodemailer.createTransporter({
+    const transporter = createTransport({
       service: 'gmail',
       auth: {
         user: process.env.GMAIL_USER, // Your Gmail address
