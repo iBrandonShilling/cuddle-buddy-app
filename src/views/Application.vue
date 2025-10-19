@@ -9,13 +9,26 @@
         <p class="text-lg text-gray-700 font-elegant">
           Tell us about yourself and your cuddle preferences!
         </p>
+        
+        <!-- Test Button -->
+        <div class="mt-6">
+          <button 
+            @click="fillTestData"
+            class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-full hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            🧪 Fill Test Data (For Testing Email)
+          </button>
+          <p class="text-xs text-gray-500 mt-2">
+            This will fill out all fields with sample data for testing
+          </p>
+        </div>
       </div>
 
       <form @submit.prevent="submitApplication" class="space-y-8">
         <!-- Photo Upload -->
         <div class="romantic-card p-8">
           <h2 class="text-2xl font-elegant text-warm-coral mb-6 text-center">
-            📸 Upload Your Cute Photo
+            📸 Upload Your Cute Photo <span class="text-red-500">*</span>
           </h2>
           <div class="flex flex-col items-center space-y-4">
             <div 
@@ -36,7 +49,8 @@
               class="hidden"
             />
             <p class="text-sm text-gray-500 text-center">
-              Upload a cute photo of yourself! The cuter, the better! 💖
+              Upload a cute photo of yourself! The cuter, the better! 💖<br>
+              <span class="text-red-500 font-semibold">Photo is required to complete your application.</span>
             </p>
           </div>
         </div>
@@ -361,6 +375,12 @@ const validationMessages = {
     "What's your favorite way to be affectionate? 💖",
     "Tell us how you express your feelings! 💗",
     "We want to know your love style! ✨"
+  ],
+  photo: [
+    "We need to see your cute face, darling! 📸",
+    "Upload a photo so we can see how adorable you are! 💕",
+    "Your photo is required for the application! 📷",
+    "We can't match you without seeing your beautiful face! ✨"
   ]
 }
 
@@ -436,7 +456,8 @@ const isFormValid = computed(() => {
          form.value.perfectCuddle &&
          form.value.whatMakesYouFeelLoved &&
          form.value.idealDate &&
-         form.value.favoriteAffection
+         form.value.favoriteAffection &&
+         form.value.photo
 })
 
 const triggerFileUpload = () => {
@@ -446,10 +467,11 @@ const triggerFileUpload = () => {
 const handlePhotoUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
-    form.value.photo = file
     const reader = new FileReader()
     reader.onload = (e) => {
-      photoPreview.value = e.target.result
+      const dataURL = e.target.result
+      form.value.photo = dataURL
+      photoPreview.value = dataURL
     }
     reader.readAsDataURL(file)
   }
@@ -461,6 +483,31 @@ const showCuteValidation = (fieldName) => {
   
   currentValidationMessage.value = randomMessage
   validationField.value = fieldName
+  showValidationMessage.value = true
+}
+
+const fillTestData = () => {
+  form.value = {
+    name: 'Alex Johnson',
+    age: '28',
+    email: 'alex.johnson@example.com',
+    recipientEmail: 'brandon.shilling@proton.me',
+    favoritePosition: 'Spooning',
+    cuddleFrequency: 'daily',
+    idealTemperature: 'Warm and cozy',
+    loveLanguage: 'physical',
+    perfectCuddle: 'Curled up on the couch with soft blankets, watching a movie together while holding hands and sharing gentle kisses.',
+    whatMakesYouFeelLoved: 'When someone remembers the little things about me, like my favorite coffee order or how I like my pillows arranged. Small gestures mean everything.',
+    idealDate: 'cozy',
+    favoriteAffection: 'Holding hands',
+    photo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDMwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZCNkMxIi8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9IjEyMCIgcj0iNDAiIGZpbGw9IiNGRkYzRjMiLz4KPHBhdGggZD0iTTEwMCAyMDBMMTUwIDE1MEwyMDAgMjAwIiBzdHJva2U9IiNGRkYzRjMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPgo8dGV4dCB4PSIxNTAiIHk9IjI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7wn5GAPC90ZXh0Pgo8L3N2Zz4K'
+  }
+  
+  // Set the photo preview
+  photoPreview.value = form.value.photo
+  
+  // Show a cute success message
+  currentValidationMessage.value = 'Test data filled! Ready to test the email service! 🎉'
   showValidationMessage.value = true
 }
 
@@ -512,6 +559,10 @@ const submitApplication = () => {
   }
   if (!form.value.favoriteAffection) {
     showCuteValidation('favoriteAffection')
+    return
+  }
+  if (!form.value.photo) {
+    showCuteValidation('photo')
     return
   }
   

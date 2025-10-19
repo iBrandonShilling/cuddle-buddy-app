@@ -96,12 +96,6 @@
           <span v-else>Send Results via Email 📧</span>
         </button>
         
-        <button 
-          @click="startNewApplication"
-          class="bg-white/70 text-warm-coral border-2 border-warm-coral font-semibold py-3 px-8 rounded-full hover:bg-warm-coral hover:text-white transition-all duration-300"
-        >
-          Create Another Application 💕
-        </button>
       </div>
 
       <!-- Romantic Quote -->
@@ -157,13 +151,16 @@ const getLoveLanguageText = (language) => {
 }
 
 const sendResults = async () => {
-  const loading = ref(false)
-  const emailSent = ref(false)
+  loading.value = true
   
   try {
-    loading.value = true
+    console.log('🚀 Sending email request with data:', {
+      recipientEmail: applicationData.value.recipientEmail,
+      name: applicationData.value.name,
+      applicationData: applicationData.value
+    })
     
-    // Send email via our Vercel API
+    // Send email via our API
     const response = await fetch('/api/send-email', {
       method: 'POST',
       headers: {
@@ -172,18 +169,22 @@ const sendResults = async () => {
       body: JSON.stringify({
         recipientEmail: applicationData.value.recipientEmail,
         name: applicationData.value.name,
-        compatibilityScore: compatibilityScore.value,
         applicationData: applicationData.value
       })
     })
     
+    console.log('📧 Response status:', response.status)
+    console.log('📧 Response ok:', response.ok)
+    
     const result = await response.json()
+    console.log('📧 Response data:', result)
     
     if (response.ok) {
       emailSent.value = true
       // Show success message
       alert('Email sent successfully! 💕 Check the recipient\'s inbox!')
     } else {
+      console.error('❌ Email failed:', result)
       throw new Error(result.error || 'Failed to send email')
     }
     
@@ -253,7 +254,4 @@ const showEmailModal = () => {
   document.body.appendChild(modal)
 }
 
-const startNewApplication = () => {
-  router.push('/apply')
-}
 </script>
