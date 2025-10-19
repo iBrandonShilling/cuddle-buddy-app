@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { recipientEmail, name, compatibilityScore, applicationData } = req.body
+  const { recipientEmail, name, applicationData } = req.body
 
   // Validate required fields
   if (!recipientEmail || !name) {
@@ -23,6 +23,27 @@ export default async function handler(req, res) {
         pass: process.env.GMAIL_APP_PASSWORD // Gmail App Password (not your regular password)
       }
     })
+
+    // Handle photo - use embedded image for production
+    let photoSection = ''
+    if (applicationData.photo) {
+      photoSection = `
+        <div style="text-align: center; margin: 30px 0; padding: 30px; background: linear-gradient(135deg, #FFB6C1, #FFC0CB); border-radius: 20px; border: 3px solid #FF7F7F; box-shadow: 0 10px 30px rgba(255, 127, 127, 0.3);">
+          <h2 style="color: #FF7F7F; font-size: 28px; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">📸 PHOTO 📸</h2>
+          <p style="color: #333; font-size: 18px; margin: 15px 0; font-weight: bold;">A photo was uploaded with this application!</p>
+          <div style="background: #fff; padding: 25px; border-radius: 15px; margin: 20px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+            <img src="${applicationData.photo}" alt="Their photo" style="max-width: 350px; max-height: 350px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); border: 4px solid #FF7F7F;" />
+          </div>
+        </div>
+      `
+    } else {
+      photoSection = `
+        <div style="text-align: center; margin: 30px 0; padding: 30px; background: #f8f9fa; border-radius: 20px; border: 3px solid #ddd;">
+          <h2 style="color: #FF7F7F; font-size: 28px; margin-bottom: 20px;">📸 PHOTO 📸</h2>
+          <p style="color: #666; font-size: 18px;">No photo was uploaded with this application.</p>
+        </div>
+      `
+    }
 
     // Create beautiful HTML email
     const htmlContent = `
@@ -48,6 +69,8 @@ export default async function handler(req, res) {
         <div class="card">
           <h2 style="color: #FF7F7F;">Dear Friend,</h2>
           <p style="font-size: 1.2rem; color: #666;">Someone special has filled out a cuddle buddy application! Here are their details:</p>
+          
+          ${photoSection}
           
           <div class="profile">
             <h3 style="color: #FF7F7F;">🌟 Their Cuddle Profile:</h3>
